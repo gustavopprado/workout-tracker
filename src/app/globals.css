@@ -1,0 +1,60 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --bg0: #1e1e1e;
+  --bg1: #313131;
+  --bg2: #414141;
+  --bg3: #525252;
+  --acc: #CA3E47;
+  --acc-hover: #e05560;
+  --acc-muted: rgba(202, 62, 71, 0.15);
+  --txt: #f0f0f0;
+  --txt2: #aaaaaa;
+  --txt3: #666666;
+  --brd: rgba(255, 255, 255, 0.07);
+  --brd2: rgba(255, 255, 255, 0.13);
+  --green: #1D9E75;
+  --amber: #BA7517;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  background: var(--bg0);
+  color: var(--txt);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#__next {
+  min-height: 100%;
+}
+
+/* Scrollbar hidden no mobile */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+button {
+  font-family: inherit;
+}
