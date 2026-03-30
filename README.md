@@ -1,4 +1,4 @@
-# Treino PPL 💪
+# Workout Tracker 💪
 
 App mobile para registrar treinos e acompanhar evolução de cargas semana a semana.
 

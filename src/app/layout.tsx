@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Treino PPL',
+  title: 'Workout Tracker',
   description: 'Registre seus treinos e evolução de cargas',
   manifest: '/manifest.json',
   icons: {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Treino PPL',
+    title: 'Workout Tracker',
   },
 }
 

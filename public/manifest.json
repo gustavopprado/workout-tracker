@@ -1,6 +1,6 @@
 {
-  "name": "Treino PPL",
-  "short_name": "Treino",
+  "name": "Workout Tracker",
+  "short_name": "Workout",
   "description": "Registre seus treinos e evolução de cargas",
   "start_url": "/",
   "display": "standalone",

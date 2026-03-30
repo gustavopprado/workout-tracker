@@ -41,7 +41,7 @@ export default function WorkoutTracker() {
     <div className={styles.root}>
       {/* ── Header fixo ── */}
       <header className={styles.header}>
-        <div className={styles.appName}>Treino PPL</div>
+        <div className={styles.appName}>Workout Tracker</div>
         <div className={styles.weekNav}>
           <button className={styles.navBtn} onClick={() => changeWeek(-1)}>‹</button>
           <span className={styles.weekLabel}>Semana {currentWeek}</span>
