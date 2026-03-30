@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background -->
+  <rect width="32" height="32" rx="7" fill="#1e1e1e"/>
+
+  <!-- Bar (horizontal rod) -->
+  <rect x="8" y="15" width="16" height="2" rx="1" fill="#CA3E47"/>
+
+  <!-- Left end stub -->
+  <rect x="2" y="15" width="3" height="2" rx="1" fill="#CA3E47"/>
+
+  <!-- Right end stub -->
+  <rect x="27" y="15" width="3" height="2" rx="1" fill="#CA3E47"/>
+
+  <!-- Left outer plate -->
+  <rect x="4" y="10" width="4" height="12" rx="1.5" fill="#CA3E47"/>
+
+  <!-- Left inner collar -->
+  <rect x="8" y="13" width="2" height="6" rx="0.5" fill="#e05560"/>
+
+  <!-- Right inner collar -->
+  <rect x="22" y="13" width="2" height="6" rx="0.5" fill="#e05560"/>
+
+  <!-- Right outer plate -->
+  <rect x="24" y="10" width="4" height="12" rx="1.5" fill="#CA3E47"/>
+</svg>

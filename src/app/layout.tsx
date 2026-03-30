@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: 'Treino PPL',
   description: 'Registre seus treinos e evolução de cargas',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
