@@ -19,6 +19,7 @@ export function useWorkout() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const saveTimer = useRef<NodeJS.Timeout | null>(null)
+  const pendingSaveRef = useRef<{ uid: string; week: number; day: DayKey; data: SessionData } | null>(null)
 
   // Inicializa auth anônimo
   useEffect(() => {
@@ -26,6 +27,23 @@ export function useWorkout() {
       setUid(id)
       setLoading(false)
     })
+  }, [])
+
+  // Salva imediatamente ao fechar/trocar de aba para não perder dados do debounce
+  useEffect(() => {
+    function flushPendingSave() {
+      if (document.visibilityState === 'hidden' && pendingSaveRef.current) {
+        const { uid, week, day, data } = pendingSaveRef.current
+        if (saveTimer.current) {
+          clearTimeout(saveTimer.current)
+          saveTimer.current = null
+        }
+        saveSession(uid, week, day, data)
+        pendingSaveRef.current = null
+      }
+    }
+    document.addEventListener('visibilitychange', flushPendingSave)
+    return () => document.removeEventListener('visibilitychange', flushPendingSave)
   }, [])
 
   function cacheKey(week: number) {
@@ -96,29 +114,46 @@ export function useWorkout() {
       [wk]: { ...prev[wk], [selectedDay]: updated },
     }))
 
+    pendingSaveRef.current = { uid, week: currentWeek, day: selectedDay, data: updated }
+
     // Debounce save: espera 1.5s sem digitar para salvar
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(async () => {
       setSaving(true)
-      await saveSession(uid, currentWeek, selectedDay, updated)
-      setSaving(false)
+      try {
+        await saveSession(uid, currentWeek, selectedDay, updated)
+      } finally {
+        setSaving(false)
+        pendingSaveRef.current = null
+      }
     }, 1500)
   }
 
   async function markDone() {
     if (!uid) return
     setSaving(true)
+
+    // Cancela debounce pendente para não sobrescrever completedAt depois
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current)
+      saveTimer.current = null
+    }
+    pendingSaveRef.current = null
+
     const session = getSession(currentWeek, selectedDay)
-    await markSessionComplete(uid, currentWeek, selectedDay, session.exercises)
-    const wk = cacheKey(currentWeek)
-    setCache((prev) => ({
-      ...prev,
-      [wk]: {
-        ...prev[wk],
-        [selectedDay]: { ...session, completedAt: new Date().toISOString() },
-      },
-    }))
-    setSaving(false)
+    try {
+      await markSessionComplete(uid, currentWeek, selectedDay, session.exercises)
+      const wk = cacheKey(currentWeek)
+      setCache((prev) => ({
+        ...prev,
+        [wk]: {
+          ...prev[wk],
+          [selectedDay]: { ...session, completedAt: new Date().toISOString() },
+        },
+      }))
+    } finally {
+      setSaving(false)
+    }
   }
 
   function changeWeek(dir: number) {

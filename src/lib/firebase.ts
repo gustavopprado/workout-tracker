@@ -82,7 +82,8 @@ export async function saveSession(
   data: SessionData
 ): Promise<void> {
   const ref = doc(db, 'workouts', uid, 'sessions', sessionId(week, day))
-  await setDoc(ref, data, { merge: true })
+  // Only save exercises — never overwrite completedAt set by markSessionComplete
+  await setDoc(ref, { exercises: data.exercises }, { merge: true })
 }
 
 export async function markSessionComplete(
