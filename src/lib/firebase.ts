@@ -46,13 +46,12 @@ export function initAuth(): Promise<string> {
 //     sessions/
 //       {week}_{day}/          ex: "3_Seg"
 //         exercises: [
-//           [                  índice = exercício
-//             { kg, reps },    série 1
-//             { kg, reps },    série 2
-//             { kg, reps },    série 3
-//           ]
+//           { sets: [{ kg, reps }, ...] },   índice = exercício
 //         ]
 //         completedAt: timestamp | null
+//
+// Firestore não suporta arrays aninhados (Serie[][]),
+// por isso cada exercício é salvo como { sets: Serie[] }.
 // ─────────────────────────────────────────────
 
 type Serie = { kg: string; reps: string }
@@ -60,9 +59,18 @@ type SessionData = {
   exercises: Serie[][]
   completedAt: string | null
 }
+type FirestoreExercise = { sets: Serie[] }
 
 function sessionId(week: number, day: string) {
   return `${week}_${day}`
+}
+
+function serialize(exercises: Serie[][]): FirestoreExercise[] {
+  return exercises.map((sets) => ({ sets }))
+}
+
+function deserialize(data: FirestoreExercise[]): Serie[][] {
+  return data.map((ex) => ex.sets ?? [])
 }
 
 export async function loadSession(
@@ -72,7 +80,12 @@ export async function loadSession(
 ): Promise<SessionData | null> {
   const ref = doc(db, 'workouts', uid, 'sessions', sessionId(week, day))
   const snap = await getDoc(ref)
-  return snap.exists() ? (snap.data() as SessionData) : null
+  if (!snap.exists()) return null
+  const raw = snap.data() as { exercises: FirestoreExercise[]; completedAt: string | null }
+  return {
+    exercises: deserialize(raw.exercises ?? []),
+    completedAt: raw.completedAt ?? null,
+  }
 }
 
 export async function saveSession(
@@ -83,7 +96,7 @@ export async function saveSession(
 ): Promise<void> {
   const ref = doc(db, 'workouts', uid, 'sessions', sessionId(week, day))
   // Only save exercises — never overwrite completedAt set by markSessionComplete
-  await setDoc(ref, { exercises: data.exercises }, { merge: true })
+  await setDoc(ref, { exercises: serialize(data.exercises) }, { merge: true })
 }
 
 export async function markSessionComplete(
@@ -94,7 +107,7 @@ export async function markSessionComplete(
 ): Promise<void> {
   const ref = doc(db, 'workouts', uid, 'sessions', sessionId(week, day))
   await setDoc(ref, {
-    exercises,
+    exercises: serialize(exercises),
     completedAt: new Date().toISOString(),
   })
 }
@@ -109,7 +122,11 @@ export async function loadAllWeekSessions(
   snap.forEach((d) => {
     if (d.id.startsWith(`${week}_`)) {
       const day = d.id.replace(`${week}_`, '')
-      result[day] = d.data() as SessionData
+      const raw = d.data() as { exercises: FirestoreExercise[]; completedAt: string | null }
+      result[day] = {
+        exercises: deserialize(raw.exercises ?? []),
+        completedAt: raw.completedAt ?? null,
+      }
     }
   })
   return result
